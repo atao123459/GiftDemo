@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Adapter;
 import android.widget.Button;
 import android.widget.TextView;
@@ -44,6 +45,7 @@ public class MypageFragment extends Fragment {
                                                    int item) {
         MypageFragment fragment = new MypageFragment();
         Bundle bdl = new Bundle(item);
+        //用于区分不同的fragment
         fragment.item = item;
         fragment.dialogFragment = dialogFragment;
         bdl.putString(EXTRA_MESSAGE, message);
@@ -72,12 +74,15 @@ public class MypageFragment extends Fragment {
         return view;
     }
 
+
+
+    //获取和设置控件,初始化数据
     @Override
     public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         RecyclerView recyclerView = view.findViewById(R.id.recycleview);
 
-        init();
+        init(item);
 
         layoutManager = new LinearLayoutManager(view.getContext());
         adapter = new MyAdapter(view.getContext(),data);
@@ -86,19 +91,34 @@ public class MypageFragment extends Fragment {
         recyclerView.setAdapter(adapter);
 
         String msg = getArguments().getString(EXTRA_MESSAGE);
-        mTvMsg = (TextView) view.findViewById(R.id.text);
-        mTvMsg.setText(msg);
+//        mTvMsg = (TextView) view.findViewById(R.id.text);
+//        mTvMsg.setText(msg);
     }
 
-    private void init() {
-        for(int i=0;i<2;i++){
-            data.add(new Item("苹果",5.5,R.drawable.apple_pic));
-            data.add(new Item("香蕉",3.8,R.drawable.banana_pic));
-            data.add(new Item("樱桃",10.2,R.drawable.cherry_pic));
-            data.add(new Item("葡萄",7.0,R.drawable.grape_pic));
-            data.add(new Item("芒果",8.0,R.drawable.mango_pic));
-            data.add(new Item("橙子",4.5,R.drawable.orange_pic));
+    private void init(int item) {
+        if (item==1){
+            for(int i=0;i<2;i++){
+                data.add(new Item("苹果",5.5,R.drawable.apple_pic));
+                data.add(new Item("香蕉",3.8,R.drawable.banana_pic));
+                data.add(new Item("樱桃",10.2,R.drawable.cherry_pic));
+                data.add(new Item("葡萄",7.0,R.drawable.grape_pic));
+                data.add(new Item("芒果",8.0,R.drawable.mango_pic));
+                data.add(new Item("橙子",4.5,R.drawable.orange_pic));
+            }
+        }else if(item==2){
+            for(int i=0;i<1;i++){
+                data.add(new Item("苹果",5.5,R.drawable.apple_pic));
+
+            }
         }
+        else {
+            for(int i=0;i<1;i++){
+                data.add(new Item("苹果",5.5,R.drawable.apple_pic));
+                data.add(new Item("香蕉",3.8,R.drawable.banana_pic));
+                data.add(new Item("樱桃",10.2,R.drawable.cherry_pic));
+            }
+        }
+
     }
 
 

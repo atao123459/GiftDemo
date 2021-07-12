@@ -1,31 +1,25 @@
 package com.example.dialogtest;
 
-import android.app.AlertDialog;
-import android.app.AppComponentFactory;
-import android.app.Dialog;
-import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
-import com.example.dialogtest.adapter.MyAdapter;
-import com.example.dialogtest.entity.Item;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+
 
 import org.jetbrains.annotations.NotNull;
 
@@ -40,6 +34,26 @@ import java.util.List;
 public class MyDialogFragment  extends DialogFragment {
 //    public static MyDialogFragment instance;
 
+    @Override
+    public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setStyle(DialogFragment.STYLE_NO_TITLE,R.style.DialogFullScreen); //dialog全屏
+    }
+
+    @Override
+    public void onStart() {
+
+        Window window = getDialog().getWindow();
+        WindowManager.LayoutParams layoutParams = window.getAttributes();
+        layoutParams.gravity = Gravity.BOTTOM;
+        layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT;
+        layoutParams.height = 1500;
+        window.setAttributes(layoutParams);
+        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+       layoutParams.windowAnimations = R.style.DialogFullScreen;
+        super.onStart();
+    }
+
     @Nullable
     @org.jetbrains.annotations.Nullable
     @Override
@@ -50,21 +64,31 @@ public class MyDialogFragment  extends DialogFragment {
         ViewPager viewPager = (ViewPager) view.findViewById(R.id.viewpager);
 
         List<Fragment> fragments = getFragment();
-
         AcoesMuscularesAdapter acoesMuscularesAdapter = new AcoesMuscularesAdapter(getChildFragmentManager(),fragments);
         //想viewpager中加入fragment
         viewPager.setAdapter(acoesMuscularesAdapter);
-        getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+
+
+
+        this.getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
+
 
         return view;
     }
 
-
+    //使用BottomSheetDialog方式实现底部弹窗
+    void showBottomSheetDialog(){
+        BottomSheetDialog bottomSheet = new BottomSheetDialog(getContext());//实例化BottomSheetDialog
+        bottomSheet.setCancelable(true);//设置点击外部是否可以取消
+        bottomSheet.setContentView(R.layout.viewpager_item);//设置对框框中的布局
+        bottomSheet.show();//显示弹窗
+    }
 
     private List<Fragment> getFragment() {
         List<Fragment> list = new ArrayList<Fragment>();
         list.add(MypageFragment.newInstance(this,"",1));
         list.add(MypageFragment.newInstance(this,"",2));
+        list.add(MypageFragment.newInstance(this,"",3));
         return list;
     }
 
