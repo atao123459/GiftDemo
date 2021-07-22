@@ -1,14 +1,24 @@
 package com.example.dialogtest;
 
+import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -34,15 +44,25 @@ import java.util.List;
 public class MyDialogFragment  extends DialogFragment {
 //    public static MyDialogFragment instance;
 
+    private ViewPager viewPager;//页卡内容
+    private ImageView imageView;// 动画图片
+    private TextView textView1,textView2;
+    private List<View> views;// Tab页面列表
+    private int offset = 0;// 动画图片偏移量
+    private int currIndex = 0;// 当前页卡编号
+    private int bmpW;// 动画图片宽度
+    private View view1,view2;//各个页卡
+
+    //设置样式
     @Override
     public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setStyle(DialogFragment.STYLE_NO_TITLE,R.style.DialogFullScreen); //dialog全屏
     }
 
+    //设置底部dialogfragment
     @Override
     public void onStart() {
-
         Window window = getDialog().getWindow();
         WindowManager.LayoutParams layoutParams = window.getAttributes();
         layoutParams.gravity = Gravity.BOTTOM;
@@ -50,16 +70,24 @@ public class MyDialogFragment  extends DialogFragment {
         layoutParams.height = 1500;
         window.setAttributes(layoutParams);
         window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-       layoutParams.windowAnimations = R.style.DialogFullScreen;
+        //设置弹窗动画
+        layoutParams.windowAnimations = R.style.DialogFullScreen;
         super.onStart();
     }
 
+    public static int getStatusBarHeight(Context context) {
+        Resources resources = context.getResources();
+        int resourceId = resources.getIdentifier("status_bar_height", "dimen", "android");
+        return resources.getDimensionPixelSize(resourceId) == 0 ? 60 : resources.getDimensionPixelSize(resourceId);
+    }
+
+    //创建视图
     @Nullable
     @org.jetbrains.annotations.Nullable
     @Override
     public View onCreateView(@NonNull @NotNull LayoutInflater inflater, @Nullable @org.jetbrains.annotations.Nullable ViewGroup container, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.viewpager_item,container);
+        View view = inflater.inflate(R.layout.viewpager_item_suit,container);
 //        instance = this;
         ViewPager viewPager = (ViewPager) view.findViewById(R.id.viewpager);
 
@@ -68,27 +96,60 @@ public class MyDialogFragment  extends DialogFragment {
         //想viewpager中加入fragment
         viewPager.setAdapter(acoesMuscularesAdapter);
 
+        ImageView bg2 = view.findViewById(R.id.iv_tab_bg2);
+        bg2.setVisibility(View.INVISIBLE);
 
+        viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                ImageView bg = view.findViewById(R.id.iv_tab_bg);
+//                ImageView bg2 = view.findViewById(R.id.iv_tab_bg2);
+//                bg2.setVisibility(View.INVISIBLE);
+                //参数position是滑动的目标页面，当滑到目标页面后手指抬起时会调用该方法
+                    // 设置标题
+//                tv_gift
+//                tv_gift_suit
+                if(position==1) {
+                    bg.setVisibility(View.INVISIBLE);
+                    bg2.setVisibility(View.VISIBLE);
+                }else if(position==0){
+                    bg2.setVisibility(View.INVISIBLE);
+                    bg.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
 
         this.getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
-
 
         return view;
     }
 
-    //使用BottomSheetDialog方式实现底部弹窗
-    void showBottomSheetDialog(){
-        BottomSheetDialog bottomSheet = new BottomSheetDialog(getContext());//实例化BottomSheetDialog
-        bottomSheet.setCancelable(true);//设置点击外部是否可以取消
-        bottomSheet.setContentView(R.layout.viewpager_item);//设置对框框中的布局
-        bottomSheet.show();//显示弹窗
-    }
+//    private void InitImageView() {
+//        bmpW = BitmapFactory.decodeResource(getResources(), R.drawable.select).getWidth();// 获取图片宽度
+//        DisplayMetrics dm = new DisplayMetrics();
+////        getWindowManager().getDefaultDisplay().getMetrics(dm);
+//        int screenW = dm.widthPixels;// 获取分辨率宽度
+//        offset = (screenW / 3 - bmpW) / 2;// 计算偏移量
+//        Matrix matrix = new Matrix();
+//        matrix.postTranslate(offset, 0);
+//        imageView.setImageMatrix(matrix);// 设置动画初始位置
+//    }
+
 
     private List<Fragment> getFragment() {
         List<Fragment> list = new ArrayList<Fragment>();
         list.add(MypageFragment.newInstance(this,"",1));
-        list.add(MypageFragment.newInstance(this,"",2));
-        list.add(MypageFragment.newInstance(this,"",3));
+        list.add(GiftSuitFragment.newInstance(this,"",1));
         return list;
     }
 
